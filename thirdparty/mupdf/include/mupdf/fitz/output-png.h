@@ -4,6 +4,7 @@
 #include "mupdf/fitz/system.h"
 #include "mupdf/fitz/context.h"
 #include "mupdf/fitz/output.h"
+#include "mupdf/fitz/band-writer.h"
 #include "mupdf/fitz/pixmap.h"
 #include "mupdf/fitz/bitmap.h"
 
@@ -11,20 +12,25 @@
 #include "mupdf/fitz/image.h"
 
 /*
-	fz_write_png: Save a pixmap as a png
-
-	filename: The filename to save as (including extension).
+	fz_save_pixmap_as_png: Save a pixmap as a PNG image file.
 */
-void fz_write_png(fz_context *ctx, fz_pixmap *pixmap, char *filename, int savealpha);
+void fz_save_pixmap_as_png(fz_context *ctx, fz_pixmap *pixmap, const char *filename);
 
 /*
-	Output a pixmap to an output stream as a png.
+	Write a pixmap to an output stream in PNG format.
 */
-void fz_output_png(fz_output *out, const fz_pixmap *pixmap, int savealpha);
+void fz_write_pixmap_as_png(fz_context *ctx, fz_output *out, const fz_pixmap *pixmap);
 
 /*
-	Get an image as a png in a buffer.
+	fz_new_png_band_writer: Obtain a fz_band_writer instance
+	for producing PNG output.
 */
-fz_buffer *fz_image_as_png(fz_context *ctx, fz_image *image, int w, int h);
+fz_band_writer *fz_new_png_band_writer(fz_context *ctx, fz_output *out);
+
+/*
+	Create a new buffer containing the image/pixmap in PNG format.
+*/
+fz_buffer *fz_new_buffer_from_image_as_png(fz_context *ctx, fz_image *image);
+fz_buffer *fz_new_buffer_from_pixmap_as_png(fz_context *ctx, fz_pixmap *pixmap);
 
 #endif

@@ -22,12 +22,13 @@ ViewerWidget::ViewerWidget(QWidget *parent) :
     setLayout(vbox);
 
     context = fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
+    fz_register_document_handlers(context);
 }
 
 ViewerWidget::~ViewerWidget()
 {
     scene->clear();
-    fz_free_context(context);
+    fz_drop_context(context);
 }
 
 void ViewerWidget::load(const QByteArray &data)
@@ -41,22 +42,22 @@ void ViewerWidget::load(const QByteArray &data)
     else if (data.startsWith("%PDF")) {
         fz_stream *stream = fz_open_memory(context, (unsigned char *)data.constData(), data.length());
         fz_document *doc = fz_open_document_with_stream(context, ".pdf", stream);
-        fz_close(stream);
-        int pagecount = fz_count_pages(doc);
+        fz_drop_stream(context, stream);
+        int pagecount = fz_count_pages(context, doc);
         for (int i = 0; i < pagecount; i++) {
-            fz_page *page = fz_load_page(doc, i);
+            fz_page *page = fz_load_page(context, doc, i);
             fz_rect bounds;
-            fz_bound_page(doc, page, &bounds);
-            fz_display_list *list = fz_new_display_list(context);
+            fz_bound_page(context, page, &bounds);
+            fz_display_list *list = fz_new_display_list(context, &bounds);
             fz_device *dev = fz_new_list_device(context, list);
-            fz_run_page(doc, page, dev, &fz_identity, NULL);
-            fz_free_device(dev);
-            fz_free_page(doc, page);
+            fz_run_page(context, page, dev, &fz_identity, NULL);
+            fz_close_device(context, dev);
+            fz_drop_device(context, dev);
+            fz_drop_page(context, page);
             PageItem *item = new PageItem(context, list, bounds.x1 - bounds.x0, bounds.y1 - bounds.y0);
-            item->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
             items << item;
         }
-        fz_close_document(doc);
+        fz_drop_document(context, doc);
     } else {
         scene->setSceneRect(0, 0, 0, 0);
         return;

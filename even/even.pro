@@ -1,12 +1,4 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2013-10-09T20:48:04
-#
-#-------------------------------------------------
-
-QT       += core gui network
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core gui network widgets
 
 TARGET = Even
 TEMPLATE = app
@@ -14,8 +6,8 @@ TEMPLATE = app
 macx: ICON = $$PWD/../extra/even.icns
 win32: RC_ICONS = $$PWD/../extra/even.ico
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
+SOURCES += main.cpp \
+    mainwindow.cpp \
     movingsplitter.cpp \
     baseedit.cpp \
     viewerwidget.cpp \
@@ -28,7 +20,7 @@ SOURCES += main.cpp\
     pythonhighlighter.cpp \
     pageitem.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS += mainwindow.h \
     movingsplitter.h \
     baseedit.h \
     viewerwidget.h \
@@ -44,14 +36,14 @@ HEADERS  += mainwindow.h \
 INCLUDEPATH += $$PWD/../thirdparty/mupdf/include
 DEPENDPATH += $$PWD/../thirdparty/mupdf/include
 
-macx: LIBS += -L$$PWD/../thirdparty/mupdf/lib/mac/ -lmupdf -lmupdf-js-none -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lm
+macx: LIBS += -L$$PWD/../thirdparty/mupdf/lib/mac/ -lmupdf -lmupdfthird
 macx: PRE_TARGETDEPS += $$PWD/../thirdparty/mupdf/lib/mac/libmupdf.a
 
-unix:!macx: LIBS += -L$$PWD/../thirdparty/mupdf/lib/linux/ -lmupdf -lmupdf-js-none -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lm
+unix:!macx: LIBS += -L$$PWD/../thirdparty/mupdf/lib/linux/ -lmupdf -lmupdfthird
 unix:!macx: PRE_TARGETDEPS += $$PWD/../thirdparty/mupdf/lib/linux/libmupdf.a
 
-win32: LIBS += -L$$PWD/../thirdparty/mupdf/lib/win/ -lmupdf -lmupdf-js-none -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lm
-win32: PRE_TARGETDEPS += $$PWD/../thirdparty/mupdf/lib/win/libmupdf.a
+#win32: LIBS += -L$$PWD/../thirdparty/mupdf/lib/win/ -lmupdf -lmupdfthird
+#win32: PRE_TARGETDEPS += $$PWD/../thirdparty/mupdf/lib/win/libmupdf.a
 
 macx: {
     THIRDPARTY = $$OUT_PWD/$${TARGET}.app/Contents/Resources
@@ -65,11 +57,6 @@ win32: {
     QMAKE_POST_LINK += $$quote(cd $$PWD/../thirdparty/flat && find ./flat -name '*.py' | cpio -pdm $$THIRDPARTY/lib;)
 }
 
-macx: QMAKE_POST_LINK += $$quote(unzip -n $$PWD/../thirdparty/pypy/pypy-2.1-osx64.zip -d $$THIRDPARTY;)
-unix:!macx: QMAKE_POST_LINK += $$quote(unzip -n $$PWD/../thirdparty/pypy/pypy-2.1-linux64.zip -d $$THIRDPARTY;)
-# win32: manually extract "pypy-2.1-win32.zip" next to Even.exe as Windows does not have unzip
-
-
-
-
-
+macx: QMAKE_POST_LINK += $$quote(tar -xvf $$PWD/../thirdparty/pypy/pypy2-v5.8.0-osx64.tar.bz2 -C $$THIRDPARTY; mv $$THIRDPARTY/pypy2-v5.8.0-osx64 $$THIRDPARTY/pypy)
+# unix:!macx: manually install PyPy for given Linux distribution (e.g. `apt-get install pypy`)
+# win32: manually extract "pypy2-v5.8.0-win32.zip" next to Even.exe as Windows does not have unzip

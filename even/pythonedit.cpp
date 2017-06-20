@@ -63,18 +63,34 @@ void PythonEdit::keyPressEvent(QKeyEvent *e)
             BaseEdit::keyPressEvent(e);
             return;
         }
-        const bool left = e->key() == Qt::Key_Left || e->key() == Qt::Key_Backspace;
-        int index = cursor.positionInBlock();
-        int count = left ? index % 4 : 4 - index % 4;
-        if (left && count == 0) count = 4;
-        index += cursor.block().position();
-        int i = 0;
-        for (; i < count; i++) {
-            int offset = left ? index - i - 1 : index + i;
-            if (document()->characterAt(offset) != ' ') break;
-            BaseEdit::keyPressEvent(e);
+        int block = cursor.block().position();
+        int position = cursor.positionInBlock();
+        int i = block + position;
+        while (i-- > block) {
+            if (document()->characterAt(i) != ' ') {
+                BaseEdit::keyPressEvent(e);
+                return;
+            }
         }
-        if (i == 0) BaseEdit::keyPressEvent(e);
+        if (e->key() == Qt::Key_Left || e->key() == Qt::Key_Backspace) {
+            if (cursor.atBlockStart()) {
+                BaseEdit::keyPressEvent(e);
+            } else {
+                int count = (position + 3) % 4 + 1;
+                while (count-- > 0) BaseEdit::keyPressEvent(e);
+            }
+        } else {
+            if (cursor.atBlockEnd() || document()->characterAt(block + position) != ' ') {
+                BaseEdit::keyPressEvent(e);
+            } else {
+                int count = 4 - position % 4;
+                while (count-- > 0) {
+                    BaseEdit::keyPressEvent(e);
+                    if (e->key() == Qt::Key_Right) position++;
+                    if (document()->characterAt(block + position) != ' ') break;
+                }
+            }
+        }
         return;
     }
     }
@@ -154,7 +170,6 @@ void PythonEdit::comment()
         QString text = block.text();
         int index = pattern.indexIn(text);
         if (index == -1) {
-            comment = true;
             width = qMin(width, text.length());
         } else {
             if (text.at(index) != '#') comment = true;
@@ -183,6 +198,15 @@ void PythonEdit::duplicate()
     cursor.setPosition(anchor);
     cursor.setPosition(position, QTextCursor::KeepAnchor);
     setTextCursor(cursor);
+
+    QList<QTextEdit::ExtraSelection> selections;
+    foreach (QTextEdit::ExtraSelection sel, extraSelections()) {
+        int anchor = sel.cursor.anchor();
+        sel.cursor.setPosition(anchor);
+        sel.cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+        selections.append(sel);
+    }
+    setExtraSelections(selections);
 }
 
 void PythonEdit::positionChanged()

@@ -8,6 +8,7 @@ PageItem::PageItem(fz_context *context, fz_display_list *list, qreal width, qrea
     ctx = context;
     lst = list;
     pageBounds = QRectF(0, 0, width, height);
+    setFlag(QGraphicsItem::ItemUsesExtendedStyleOption);
 }
 
 PageItem::~PageItem()
@@ -37,15 +38,17 @@ void PageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     fz_irect bbox;
     fz_round_rect(&bbox, &bounds);
+    bbox.x1 += (32 - ((bbox.x1 - bbox.x0) & 31)) & 31;
 
-    fz_pixmap *pix = fz_new_pixmap_with_bbox(ctx, fz_device_bgr(ctx), &bbox);
+    fz_pixmap *pix = fz_new_pixmap_with_bbox(ctx, fz_device_rgb(ctx), &bbox, 0);
     fz_clear_pixmap_with_value(ctx, pix, 255);
 
-    fz_device *dev = fz_new_draw_device(ctx, pix);
-    fz_run_display_list(lst, dev, &transform, &bounds, NULL);
-    fz_free_device(dev);
+    fz_device *dev = fz_new_draw_device(ctx, &fz_identity, pix);
+    fz_run_display_list(ctx, lst, dev, &transform, &bounds, NULL);
+    fz_close_device(ctx, dev);
+    fz_drop_device(ctx, dev);
 
-    QImage image(pix->samples, bbox.x1 - bbox.x0, bbox.y1 - bbox.y0, QImage::Format_ARGB32);
+    QImage image(pix->samples, bbox.x1 - bbox.x0, bbox.y1 - bbox.y0, QImage::Format_RGB888);
     painter->setClipRect(boundingRect());
     painter->drawImage(QRectF(bbox.x0 * inv, bbox.y0 * inv, (bbox.x1 - bbox.x0) * inv, (bbox.y1 - bbox.y0) * inv), image);
 

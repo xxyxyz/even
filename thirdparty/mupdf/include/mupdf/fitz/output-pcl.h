@@ -4,6 +4,7 @@
 #include "mupdf/fitz/system.h"
 #include "mupdf/fitz/context.h"
 #include "mupdf/fitz/output.h"
+#include "mupdf/fitz/band-writer.h"
 #include "mupdf/fitz/pixmap.h"
 #include "mupdf/fitz/bitmap.h"
 
@@ -28,6 +29,7 @@ struct fz_pcl_options_s
 	int manual_feed;
 	int media_position_set;
 	int media_position;
+	int orientation;
 
 	/* Updated as we move through the job */
 	int page_count;
@@ -89,12 +91,16 @@ void fz_pcl_preset(fz_context *ctx, fz_pcl_options *opts, const char *preset);
 */
 void fz_pcl_option(fz_context *ctx, fz_pcl_options *opts, const char *option, int val);
 
-void fz_output_pcl(fz_output *out, const fz_pixmap *pixmap, fz_pcl_options *pcl);
+fz_band_writer *fz_new_mono_pcl_band_writer(fz_context *ctx, fz_output *out, const fz_pcl_options *options);
 
-void fz_output_pcl_bitmap(fz_output *out, const fz_bitmap *bitmap, fz_pcl_options *pcl);
+void fz_write_bitmap_as_pcl(fz_context *ctx, fz_output *out, const fz_bitmap *bitmap, const fz_pcl_options *pcl);
 
-void fz_write_pcl(fz_context *ctx, fz_pixmap *pixmap, char *filename, int append, fz_pcl_options *pcl);
+void fz_save_bitmap_as_pcl(fz_context *ctx, fz_bitmap *bitmap, char *filename, int append, const fz_pcl_options *pcl);
 
-void fz_write_pcl_bitmap(fz_context *ctx, fz_bitmap *bitmap, char *filename, int append, fz_pcl_options *pcl);
+fz_band_writer *fz_new_color_pcl_band_writer(fz_context *ctx, fz_output *out, const fz_pcl_options *options);
+
+void fz_write_pixmap_as_pcl(fz_context *ctx, fz_output *out, const fz_pixmap *pixmap, const fz_pcl_options *pcl);
+
+void fz_save_pixmap_as_pcl(fz_context *ctx, fz_pixmap *pixmap, char *filename, int append, const fz_pcl_options *pcl);
 
 #endif

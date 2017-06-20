@@ -52,6 +52,6 @@ void FindWidget::replace()
 {
     QString needle = findEdit->text();
     QString replacement = replaceEdit->text();
-    if (!needle.isEmpty() && !replacement.isEmpty()) emit replaceSignal(needle, replacement);
+    if (!needle.isEmpty()) emit replaceSignal(needle, replacement);
     hide();
 }

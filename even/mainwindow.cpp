@@ -29,6 +29,7 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     if (eventuallySave()) {
+        editor->document()->setModified(false);
         saveSettings();
         e->accept();
     } else {
@@ -262,8 +263,10 @@ void MainWindow::run()
     arguments << "-c" << editor->toPlainText();
     process->setProcessEnvironment(environment);
     process->setWorkingDirectory(canonicalDir);
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     process->start(thirdparty + "/pypy/pypy", arguments);
+#elif defined(Q_OS_LINUX)
+    process->start("pypy", arguments);
 #else
     process->start(thirdparty + "/pypy/bin/pypy", arguments);
 #endif

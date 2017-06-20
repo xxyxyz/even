@@ -5,14 +5,14 @@
 	pdf_new_pdf_device: Create a pdf device. Rendering to the device creates
 	new pdf content. WARNING: this device is work in progress. It doesn't
 	currently support all rendering cases.
-*/
-fz_device *pdf_new_pdf_device(pdf_document *doc, pdf_obj *contents, pdf_obj *resources, const fz_matrix *ctm);
 
-/*
-	pdf_write_document: Write out the document to a file with all changes finalised.
+	Note that contents must be a stream (dictionary) to be updated (or
+	a reference to a stream). Callers should take care to ensure that it
+	is not an array, and that is it not shared with other objects/pages.
 */
-void pdf_write_document(pdf_document *doc, char *filename, fz_write_options *opts);
+fz_device *pdf_new_pdf_device(fz_context *ctx, pdf_document *doc, const fz_matrix *topctm,
+		const fz_rect *mediabox, pdf_obj *resources, fz_buffer *contents);
 
-void pdf_localise_page_resources(pdf_document *doc);
+void pdf_localise_page_resources(fz_context *ctx, pdf_document *doc);
 
 #endif
