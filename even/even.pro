@@ -1,5 +1,7 @@
 QT += core gui network widgets
 
+unix:!macx: QMAKE_LFLAGS += -no-pie
+
 TARGET = Even
 TEMPLATE = app
 
@@ -57,6 +59,6 @@ win32: {
     QMAKE_POST_LINK += $$quote(cd $$PWD/../thirdparty/flat && find ./flat -name '*.py' | cpio -pdm $$THIRDPARTY/lib;)
 }
 
-macx: QMAKE_POST_LINK += $$quote(tar -xvf $$PWD/../thirdparty/pypy/pypy2-v5.8.0-osx64.tar.bz2 -C $$THIRDPARTY; mv $$THIRDPARTY/pypy2-v5.8.0-osx64 $$THIRDPARTY/pypy)
-# unix:!macx: manually install PyPy for given Linux distribution (e.g. `apt-get install pypy`)
-# win32: manually extract "pypy2-v5.8.0-win32.zip" next to Even.exe as Windows does not have unzip
+macx: QMAKE_POST_LINK += $$quote(tar -xvf $$PWD/../thirdparty/pypy/pypy3.6-v7.3.1-osx64.tar.bz2 -C $$THIRDPARTY; mv $$THIRDPARTY/pypy3.6-v7.3.1-osx64 $$THIRDPARTY/pypy)
+# unix:!macx: manually install PyPy for given Linux distribution (e.g. `apt-get install pypy3`)
+# win32: manually extract "pypy3.6-v7.3.1-win32.zip" next to Even.exe as Windows does not have unzip

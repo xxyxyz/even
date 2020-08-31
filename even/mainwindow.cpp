@@ -264,11 +264,11 @@ void MainWindow::run()
     process->setProcessEnvironment(environment);
     process->setWorkingDirectory(canonicalDir);
 #if defined(Q_OS_WIN)
-    process->start(thirdparty + "/pypy/pypy", arguments);
+    process->start(thirdparty + "/pypy/pypy3", arguments);
 #elif defined(Q_OS_LINUX)
-    process->start("pypy", arguments);
+    process->start("pypy3", arguments);
 #else
-    process->start(thirdparty + "/pypy/bin/pypy", arguments);
+    process->start(thirdparty + "/pypy/bin/pypy3", arguments);
 #endif
     if (!process->waitForStarted()) {
         done();
